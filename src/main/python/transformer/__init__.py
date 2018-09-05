@@ -3,6 +3,10 @@
 """A PyTorch implementation of the Transformer model from "Attention Is All You Need"."""
 
 
+from transformer.transformer import Transformer
+from transformer.transformer_tools import *
+
+
 __author__ = "Patrick Hohenecker"
 __copyright__ = (
         "Copyright (c) 2018, Patrick Hohenecker\n"
