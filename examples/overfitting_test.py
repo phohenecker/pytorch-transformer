@@ -8,7 +8,9 @@ considered model is trained and evaluated on the same tiny dataset, which it sho
 Therefore, the final model should yield very high probabilities for the desired target values. If this is not the case,
 however, then there is probably something wrong with the tested model and/or its implementation.
 
-TODO: explain a bit more
+In this module, we test our implementation of the Transformer model on a super-simple translation task from German to
+English. To that end, the considered corpus consists of 5 short and already pre-processed sentences, and is specified in
+this file (see below).
 """
 
 
@@ -72,7 +74,7 @@ DATA_GERMAN = [
         "Alle warten auf das Licht .",
         "Fürchtet euch , fürchtet euch nicht .",
         "Die Sonne scheint mir aus den Augen .",
-        "Sie wird heut Nacht nicht untergehen .",
+        "Sie wird heut ' Nacht nicht untergehen .",
         "Und die Welt zählt laut bis 10 ."
 ]
 
@@ -102,7 +104,7 @@ PAD = Token(2, "<pad>")
 EMBEDDING_SIZE = 300
 """int: The used embedding size."""
 
-GPU = False
+GPU = False  # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SET THIS TO True, IF YOU ARE USING A MACHINE WITH A GPU!
 """bool: Indicates whether to make use of a GPU."""
 
 NUM_EPOCHS = 200
