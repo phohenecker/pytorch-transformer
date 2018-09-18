@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""This module provides Various utility functions."""
+"""This module provides various utility functions."""
 
 
 import itertools
