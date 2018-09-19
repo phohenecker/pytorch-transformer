@@ -86,6 +86,10 @@ def eval_probability(
     batch_size = input_seq.size(0)
     max_seq_len = input_seq.size(1)
     
+    # put model in evaluation mode
+    original_mode = model.training  # store original mode (train/eval) to be restored eventually
+    model.eval()
+    
     # run the model to compute the needed probabilities
     predictions = model(input_seq, target_seq)
     
@@ -101,5 +105,8 @@ def eval_probability(
     for sample_idx in range(batch_size):  # iterate over each sample
         for token_idx in range(seq_len[sample_idx]):  # iterate over each position in the output sequence
             sample_probs[sample_idx] *= predictions[sample_idx, token_idx, target_seq[sample_idx, token_idx]].item()
+
+    # restore original mode of the model
+    model.train(mode=original_mode)
     
     return sample_probs
