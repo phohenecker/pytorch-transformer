@@ -205,7 +205,7 @@ def main():
             emb,
             PAD.index,
             emb.num_embeddings,
-            max_seq_len=target_seq.size(1)
+            max_seq_len=max(input_seq.size(1), target_seq.size(1))
     )
 
     # create an optimizer for training the model + a X-entropy loss
@@ -237,12 +237,28 @@ def main():
         optimizer.step()
     
         print("OK (loss: {:.6f})".format(current_loss.item()))
+    
+    # put model in evaluation mode
+    model.eval()
 
     print()
     print("Final Probabilities of Translations:")
     print("------------------------------------")
     eval_model(model, input_seq, target_seq)
+    
+    # randomly sample outputs from the input sequences based on the probabilities computed by the trained model
+    sampled_output = transformer.sample_output(model, input_seq, EOS.index, PAD.index, target_seq.size(1))
+
     print()
+    print("Sampled Outputs:")
+    print("----------------")
+    for sample_idx in range(input_seq.size(0)):
+        for token_idx in range(input_seq.size(1)):
+            print(idx_to_word[input_seq[sample_idx, token_idx].item()], end=" ")
+        print(" => ", end=" ")
+        for token_idx in range(sampled_output.size(1)):
+            print(idx_to_word[sampled_output[sample_idx, token_idx].item()], end=" ")
+        print()
 
 
 if __name__ == "__main__":
