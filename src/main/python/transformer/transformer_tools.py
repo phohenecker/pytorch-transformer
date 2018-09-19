@@ -110,3 +110,86 @@ def eval_probability(
     model.train(mode=original_mode)
     
     return sample_probs
+
+
+def sample_output(
+        model: transformer.Transformer,
+        input_seq: torch.LongTensor,
+        eos_index: int,
+        pad_index: int,
+        max_len: int
+) -> torch.LongTensor:
+    """Samples an output sequence based on the provided input.
+    
+    Args:
+        model (:class:`transformer.Transformer`): The model to use.
+        input_seq (torch.LongTensor): The input sequence to be provided to the model. This has to be a
+            (batch-size x input-seq-len)-tensor.
+        eos_index (int): The index that indicates the end of a sequence.
+        pad_index (int): The index that indicates a padding token in a sequence.
+        max_len (int): The maximum length of the generated output.
+    
+    Returns:
+        torch.LongTensor: The generated output sequence as (batch-size x output-seq-len)-tensor.
+    """
+    # sanitize args
+    if not isinstance(model, transformer.Transformer):
+        raise TypeError("The <model> has to be a transformer.Transformer!")
+    if not isinstance(input_seq, torch.LongTensor) and not isinstance(input_seq, torch.cuda.LongTensor):
+        raise TypeError("The <input_seq> has to be a LongTensor!")
+    if input_seq.dim() != 2:
+        raise ValueError("<input_seq> has to be a matrix!")
+    if not isinstance(eos_index, int):
+        raise TypeError("The <eos_index> has to be an integer!")
+    if eos_index < 0 or eos_index >= model.output_size:
+        raise ValueError("The <eos_index> is not a legal index in the vocabulary used by <model>!")
+    if not isinstance(pad_index, int):
+        raise TypeError("The <pad_index> has to be an integer!")
+    if pad_index < 0 or pad_index >= model.output_size:
+        raise ValueError("The <pad_index> is not a legal index in the vocabulary used by <model>!")
+    if max_len is not None:
+        if not isinstance(max_len, int):
+            raise TypeError("<max_len> has to be an integer!")
+        if max_len < 1:
+            raise ValueError("<max_len> has to be > 0!")
+    
+    original_mode = model.training  # the original mode (train/eval) of the provided model
+    batch_size = input_seq.size(0)  # number of samples in the provided input sequence
+    
+    # put model in evaluation mode
+    model.eval()
+    
+    output_seq = []  # used to store
+    finished = [False] * batch_size
+    
+    for _ in range(max_len):
+        
+        # prepare the target to provide to the model
+        # this is the current output with an additional final entry that is supposed to be predicted next
+        # (which is why the concrete value does not matter)
+        current_target = torch.cat(output_seq + [input_seq.new(batch_size, 1).zero_()], dim=1)
+        
+        # run the model
+        probs = model(input_seq, current_target)[:, -1, :]
+        
+        # sample next output form the computed probabilities
+        output = torch.multinomial(probs, 1)
+        
+        # determine which samples have been finished, and replace sampled output with padding for those that are already
+        for sample_idx in range(batch_size):
+            if finished[sample_idx]:
+                output[sample_idx, 0] = pad_index
+            elif output[sample_idx, 0].item() == eos_index:
+                finished[sample_idx] = True
+        
+        # store created output
+        output_seq.append(output)
+        
+        # check whether generation has been finished
+        if all(finished):
+            break
+    
+    # restore original mode of the model
+    model.train(mode=original_mode)
+    
+    return torch.cat(output_seq, dim=1)

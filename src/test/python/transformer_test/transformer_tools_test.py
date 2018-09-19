@@ -80,14 +80,13 @@ class TransformerToolsTest(ttc.TorchTestCase):
                                 [0.1, 0.6, 0.05, 0.05, 0.2]
                         ],
                         [
-                            [0.2, 0.2, 0.2, 0.2, 0.2],
-                            [0.0, 0.1, 0.2, 0.3, 0.4],
-                            [0.4, 0.3, 0.2, 0.1, 0.0]
+                                [0.2, 0.2, 0.2, 0.2, 0.2],
+                                [0.0, 0.1, 0.2, 0.3, 0.4],
+                                [0.4, 0.3, 0.2, 0.1, 0.0]
                         ]
                 ]
         )
         target_probs = torch.FloatTensor([0.16, 0.12, 0.2])
-        
         
         # prepare model
         model = transformer.Transformer(
@@ -106,3 +105,86 @@ class TransformerToolsTest(ttc.TorchTestCase):
                 (target_probs - probs).abs(),
                 self.TOLERANCE
         )
+    
+    def test_sample_output(self):
+        eos_index = 0
+        pad_index = 1
+        
+        # prepare mock outputs of the model
+        outputs = [
+                torch.FloatTensor(
+                        [                                           # time step 0
+                                [                                   # + sample 0
+                                        [0.0, 0.0, 1.0, 0.0, 0.0]   # | + output 0 -> 2
+                                ],                                  # |
+                                [                                   # + sample 1
+                                        [0.0, 0.0, 0.0, 1.0, 0.0]   # | + output 0 -> 3
+                                ]
+                        ]
+                ),
+                torch.FloatTensor(
+                        [                                           # time step 1
+                                [                                   # + sample 0
+                                        [0.0, 0.0, 1.0, 0.0, 0.0],  # | + output 0
+                                        [1.0, 0.0, 0.0, 0.0, 0.0]   # | + output 1 -> 0 = EOS
+                                ],                                  # |
+                                [                                   # + sample 1
+                                        [0.0, 0.0, 0.0, 1.0, 0.0],  # | + output 0
+                                        [0.0, 0.0, 0.0, 0.0, 1.0]   # | + output 1 -> 4
+                                ]
+                        ]
+                ),
+                torch.FloatTensor(
+                        [                                           # time step 2
+                                [                                   # + sample 0
+                                        [0.0, 0.0, 1.0, 0.0, 0.0],  # | + output 0
+                                        [1.0, 0.0, 0.0, 0.0, 0.0],  # | + output 1
+                                        [0.0, 0.0, 1.0, 0.0, 0.0]   # | + output 2 -> IRRELEVANT
+                                ],                                  # |
+                                [                                   # + sample 1
+                                        [0.0, 0.0, 0.0, 1.0, 0.0],  # | + output 0
+                                        [0.0, 0.0, 0.0, 0.0, 1.0],  # | + output 1
+                                        [1.0, 0.0, 0.0, 0.0, 0.0]   # | + output 2 -> 0 = EOS
+                                ]
+                        ]
+                )
+        ]
+        
+        def forward_patch(_, trans_target_seq) -> torch.FloatTensor:
+            return outputs[trans_target_seq.size(1) - 1]
+        
+        # prepare the input sequence
+        input_seq = torch.LongTensor(
+                [
+                        [2, 2, 2, 2, 2, 2],
+                        [3, 3, 3, 3, 3, 3]
+                ]
+        )
+        
+        # prepare the target output sequence
+        target = torch.LongTensor(
+                [
+                        [2, eos_index, pad_index],
+                        [3, 4, eos_index]
+                ]
+        )
+        
+        # prepare model
+        model = transformer.Transformer(
+                nn.Embedding(5, 5),  # word_emb
+                pad_index,           # pad_index
+                5,                   # output_size
+                max_seq_len=100
+        )
+        
+        # patch the model to return the probabilities defined above
+        with mock.patch("transformer.Transformer.forward", mock.Mock(side_effect=forward_patch)):
+            
+            # generate an output sequence
+            output_seq = tt.sample_output(model, input_seq, eos_index, pad_index, 100)
+            
+            # CHECK: The generated sequence tensor has the expected shape
+            self.assertEqual(target.shape, output_seq.shape)
+            
+            # CHECK: The generated sequences are as expected
+            self.assertEqual(target, output_seq)
