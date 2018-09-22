@@ -37,4 +37,4 @@ dependencies:
   - numpy>=1.15.0
   - pytorch>=0.4.1
   - pip:
-    - torchtestcase>=2018.1
+    - torchtestcase>=2018.2
