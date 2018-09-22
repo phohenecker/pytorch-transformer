@@ -156,20 +156,19 @@ class UtilTest(ttc.TorchTestCase):
         target_mask = torch.ByteTensor(
                 [
                         [
-                                [0, 0, 0, 0],
                                 [1, 0, 0, 0],
                                 [1, 1, 0, 0],
-                                [1, 1, 1, 0]
+                                [1, 1, 1, 0],
+                                [1, 1, 1, 1]
                         ],
                         [
-                                [0, 0, 0, 0],
                                 [1, 0, 0, 0],
                                 [1, 1, 0, 0],
-                                [1, 1, 1, 0]
+                                [1, 1, 1, 0],
+                                [1, 1, 1, 1]
                         ]
                 ]
         )
-        
         
         # create the mask
         mask = util.create_shifted_output_mask(seq)
@@ -182,3 +181,41 @@ class UtilTest(ttc.TorchTestCase):
 
         # CHECK: the mask contains the correct values
         self.assertEqual(target_mask, mask)
+    
+    def test_shift_output_sequence(self):
+        # create test data
+        seq = torch.FloatTensor(
+                [
+                        [
+                                [1, 2, 3, 4, 5],
+                                [11, 22, 33, 44, 55],
+                                [111, 222, 333, 444, 555]
+                        ],
+                        [
+                                [6, 7, 8, 9, 0],
+                                [66, 77, 88, 99, 00],
+                                [666, 777, 888, 999, 000]
+                        ]
+                ]
+        )
+        target = torch.FloatTensor(
+                [
+                        [
+                                [0, 0, 0, 0, 0],
+                                [1, 2, 3, 4, 5],
+                                [11, 22, 33, 44, 55]
+                        ],
+                        [
+                                [0, 0, 0, 0, 0],
+                                [6, 7, 8, 9, 0],
+                                [66, 77, 88, 99, 00]
+                        ]
+                ]
+        )
+        
+        # shift the sequences
+        shifted_seq = util.shift_output_sequence(seq)
+        
+        # CHECK: the sequence has been shifted correctly
+        self.eps = 1e-9
+        self.assertEqual(target, shifted_seq)

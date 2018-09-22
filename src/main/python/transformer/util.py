@@ -4,6 +4,7 @@
 
 
 import itertools
+import numbers
 
 import numpy as np
 import torch
@@ -123,9 +124,45 @@ def create_shifted_output_mask(seq: torch.Tensor) -> torch.ByteTensor:
     seq_len = seq.size(1)
     
     # create a mask for one sample
-    mask = 1 - seq.new(seq_len, seq_len).fill_(1).triu().byte()
+    mask = 1 - seq.new(seq_len, seq_len).fill_(1).triu(diagonal=1).byte()
     
     # copy the mask for all samples in the batch
     mask = mask.unsqueeze(0).expand(batch_size, -1, -1)
     
     return mask
+
+
+def shift_output_sequence(seq: torch.Tensor, zero_range: numbers.Real=1e-24) -> torch.Tensor:
+    """Shifts the provided output sequence one position to the right.
+    
+    To shift the sequence, this function truncates the last element of and prepends a zero-entry to every element of
+    the provided batch. However, to prevent ``nan`` values in the gradients of tensors created by means of
+    ``torch.std``, the prepended tensors are not actually set to 0, but sampled uniformly from a tiny interval around 0,
+    which may be adjusted via the arg ``zero_range``.
+    
+    Args:
+        seq (torch.Tensor): The sequence to shift as (batch-size x seq-length x dim-model)-tensor.
+        zero_range (numbers.Real, optional): Specifies the range to sample zero-entries from as closed interval
+            [``zero_range``, ``-zero_range``].
+    
+    Returns:
+        torch.Tensor: The shifted sequence, which, just like ``seq``, is a (batch-size x seq-length x dim-model)-tensor.
+    """
+    # sanitize args
+    if not isinstance(seq, torch.Tensor):
+        raise TypeError("<seq> has to be a tensor!")
+    if seq.dim() != 3:
+        raise ValueError("Expected <seq> to be 3D, but {} dimensions were encountered!".format(seq.dim()))
+    if not isinstance(zero_range, numbers.Real):
+        raise TypeError("The <zero_range> has to be a real number!")
+    zero_range = float(zero_range)
+    if zero_range <= 0:
+        raise ValueError("The <zero_range> has to be a positive number!")
+    
+    return torch.cat(
+            [
+                    seq.new(seq.size(0), 1, seq.size(2)).uniform_(-zero_range, zero_range),
+                    seq[:, :-1, :]
+            ],
+            dim=1
+    )

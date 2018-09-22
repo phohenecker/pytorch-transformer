@@ -43,7 +43,8 @@ __status__ = "Development"
 
 class DecoderTest(ttc.TorchTestCase):
     
-    TOLERANCE = 1e-5
+    TOLERANCE = 1e-6
+    """float: The tolerance used for tensor equality assertions."""
     
     def setUp(self):
         self.num_layers = 2
@@ -99,25 +100,32 @@ class DecoderTest(ttc.TorchTestCase):
                         ]
                 ]
         )
+        output_seq_2 = output_seq.clone()
+        output_seq_2[0, -1] = torch.FloatTensor([0.6, 0.7, 0.8, 0.9, 1.0])
+        output_seq_2[1, -1] = torch.FloatTensor([0.66, 0.77, 0.88, 0.99, 11.0])
         shifted_output_mask = util.create_shifted_output_mask(output_seq)
+        
+        # NOTICE:
+        # output_seq and output_seq_1 differ at the last time step only
 
         # compute target
-        target = output_seq
+        target = util.shift_output_sequence(output_seq)
         for layer in dec._layers:
             target = layer(input_seq, target, padding_mask, shifted_output_mask)
-        target = target.detach()
 
-        # run the decoder
-        dec_seq = dec(input_seq, output_seq, padding_mask).detach()
+        # run the decoder on both output sequences
+        dec_seq = dec(input_seq, output_seq, padding_mask)
+        dec_seq_2 = dec(input_seq, output_seq_2, padding_mask)
 
         # CHECK: the provided output has the same shape as the input
         self.assertEqual(output_seq.size(), dec_seq.size())
 
-        # CHECK: the encoder computes the expected target
-        self.assertLessEqual(
-                (target - dec_seq).abs(),
-                torch.ones(target.size()) * self.TOLERANCE
-        )
+        # CHECK: the encoder computes the expected targets
+        self.eps = self.TOLERANCE
+        self.assertEqual(target, dec_seq)
+        self.assertEqual(target, dec_seq_2)
+        # -> both of the computed values have to be equal, as the provided target output sequences differ at the last
+        #    time step only, which is not considered because of the performed shift
 
     def test_init(self):
         dec = decoder.Decoder(

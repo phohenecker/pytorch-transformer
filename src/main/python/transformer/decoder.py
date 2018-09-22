@@ -90,8 +90,11 @@ class Decoder(nn.Module, enc_dec_base.EncDecBase):
             assert padding_mask.size(1) == in_sequence.size(1)
             assert padding_mask.size(2) == in_sequence.size(1)
         
-        # create shifted output mask (if output is provided)
+        # create shifted output mask
         shifted_output_mask = util.create_shifted_output_mask(out_sequence)
+        
+        # shift provided target output to the right
+        out_sequence = util.shift_output_sequence(out_sequence)
     
         # apply all layers to the input
         for layer in self._layers:
@@ -183,7 +186,7 @@ class _DecoderLayer(nn.Module):
         # compute attention sub-layer 2
         out_sequence = self.norm(
                 self.dropout(
-                    self.attn_2(out_sequence, in_sequence, in_sequence, mask=padding_mask)
+                        self.attn_2(out_sequence, in_sequence, in_sequence, mask=padding_mask)
                 ) + out_sequence
         )
         
