@@ -209,7 +209,7 @@ def main():
     )
 
     # create an optimizer for training the model + a X-entropy loss
-    optimizer = optim.Adam((param for param in model.parameters() if param.requires_grad), lr=0.0005)
+    optimizer = optim.Adam((param for param in model.parameters() if param.requires_grad), lr=0.0001)
     loss = nn.CrossEntropyLoss()
     
     print("Initial Probabilities of Translations:")
