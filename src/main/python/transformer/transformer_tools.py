@@ -159,7 +159,7 @@ def sample_output(
     # put model in evaluation mode
     model.eval()
     
-    output_seq = []  # used to store
+    output_seq = []  # used to store the generated outputs for each position
     finished = [False] * batch_size
     
     for _ in range(max_len):

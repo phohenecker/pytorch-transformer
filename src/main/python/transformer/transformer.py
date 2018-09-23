@@ -71,7 +71,8 @@ class Transformer(nn.Module):
             pad_index (int): The index that indicates that a token in an input sequence is just padding.
             output_size (int): The size, i.e., the number of dimensions, of the output to provide.
             positional_emb (nn.Embedding, optional): The positional embeddings to use.
-            max_seq_len (int, optional): The maximum length of any input sequences.
+            max_seq_len (int, optional): The maximum length of any input or output sequences. This is used to generate
+                positional embeddings, if ``positional_emb`` is not provided.
             num_layers (int): The number of to use.
             num_heads (int): The number of attention heads to use.
             dim_model (int): The dimension to use for all layers. This is called d_model, in the paper.
