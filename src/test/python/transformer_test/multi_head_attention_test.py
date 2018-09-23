@@ -106,10 +106,6 @@ class MultiHeadAttentionTest(ttc.TorchTestCase):
         if np.abs(a - t.detach().numpy()).max() > self.TOLERANCE:
             raise AssertionError("The values are different!")
     
-    def assertEqualTensors(self, a: torch.Tensor, b: torch.Tensor):
-        if (a.detach() - b.detach()).abs().max().item() > self.TOLERANCE:
-            raise AssertionError("The tensors are different!")
-    
     def test_apply_attention(self):
         # project queries, keys, and values to the needed dimensions
         in_queries, in_keys, in_values = self.attn._project_inputs(self.in_queries, self.in_keys, self.in_values)
@@ -185,19 +181,19 @@ class MultiHeadAttentionTest(ttc.TorchTestCase):
         ).detach()
         
         # CHECK: attention over short values yielded the same values as using the mask
-        self.assertLessEqual(
-                (short_attn_values[:, 0] - short_attn_values_2[:, 0]).abs(),
-                self.TOLERANCE
-        )
+        self.eps = self.TOLERANCE
+        self.assertEqual(short_attn_values[:, 0], short_attn_values_2[:, 0])
         
         # CHECK: if the mask is all 0, then the retrieved values are 0 as well
+        self.eps = 0
         self.assertEqual(
                 torch.zeros(in_queries.size()),
                 self.attn._apply_attention(
                         in_queries,
                         in_keys,
                         in_values,
-                        torch.zeros(in_queries.size(0), in_queries.size(1), in_keys.size(1)).byte()).detach()
+                        torch.zeros(in_queries.size(0), in_queries.size(1), in_keys.size(1)).byte()
+                )
         )
     
     def test_project_inputs(self):
@@ -276,4 +272,5 @@ class MultiHeadAttentionTest(ttc.TorchTestCase):
                 target_output = torch.matmul(concat_values, output_projection).squeeze()
                 
                 # CHECK: the retrieved output is correct
-                self.assertEqualTensors(target_output.data, output[sample_idx][query_idx].data)
+                self.eps = self.TOLERANCE
+                self.assertEqual(target_output, output[sample_idx][query_idx])
