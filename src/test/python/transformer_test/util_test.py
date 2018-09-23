@@ -217,5 +217,5 @@ class UtilTest(ttc.TorchTestCase):
         shifted_seq = util.shift_output_sequence(seq)
         
         # CHECK: the sequence has been shifted correctly
-        self.eps = 1e-9
+        self.eps = 1e-22
         self.assertEqual(target, shifted_seq)

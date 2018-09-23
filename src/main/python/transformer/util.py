@@ -132,7 +132,7 @@ def create_shifted_output_mask(seq: torch.Tensor) -> torch.ByteTensor:
     return mask
 
 
-def shift_output_sequence(seq: torch.Tensor, zero_range: numbers.Real=1e-24) -> torch.Tensor:
+def shift_output_sequence(seq: torch.Tensor, zero_range: numbers.Real=1e-22) -> torch.Tensor:
     """Shifts the provided output sequence one position to the right.
     
     To shift the sequence, this function truncates the last element of and prepends a zero-entry to every element of

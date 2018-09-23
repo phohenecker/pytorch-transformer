@@ -43,7 +43,7 @@ __status__ = "Development"
 
 class DecoderTest(ttc.TorchTestCase):
     
-    TOLERANCE = 1e-6
+    TOLERANCE = 1e-4
     """float: The tolerance used for tensor equality assertions."""
     
     def setUp(self):
