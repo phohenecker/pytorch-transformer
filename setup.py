@@ -60,7 +60,7 @@ setup(
         ],
         license="BSD-2-Clause",
         long_description=long_description,
-        name="pytorch-transformer",
+        name="transformer",
         package_dir={"": "src/main/python"},
         packages=[
                 "transformer"
