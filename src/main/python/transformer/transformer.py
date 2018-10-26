@@ -214,7 +214,7 @@ class Transformer(nn.Module):
         
         Returns:
             torch.FloatTensor: The computed probabilities for each position in ``target`` as a
-                (batch-size x target-seq-len x vocab-size)-tensor.
+                (batch-size x target-seq-len x output-size)-tensor.
         """
         # sanitize args
         if not isinstance(input_seq, torch.LongTensor) and not isinstance(input_seq, torch.cuda.LongTensor):
