@@ -151,13 +151,13 @@ def fetch_vocab() -> typing.Tuple[typing.List[str], typing.Dict[str, int]]:
 
 
 def prepare_data(word_to_idx: typing.Dict[str, int]) -> typing.Tuple[torch.LongTensor, torch.LongTensor]:
-    """Prepares the data is PyTorch ``LongTensor``s.
+    """Prepares the data as PyTorch ``LongTensor``s.
     
     Args:
         word_to_idx (dict[str, int]): A dictionary that maps words to indices in the vocabulary.
     
     Returns:
-        tuple: A pair of ``LongTensor``s, the first representing the input and the second the target sequences.
+        tuple: A pair of ``LongTensor``s, the first representing the input and the second the target sequence.
     """
     # break sentences into word tokens
     german = []
