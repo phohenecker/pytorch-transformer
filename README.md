@@ -6,6 +6,16 @@ This repository provides a PyTorch implementation of the *Transformer* model tha
 *Attention Is All You Need* (Vaswani et al. 2017).
 
 
+Installation
+------------
+
+The easiest way to install this package is via pip:
+
+```bash
+pip install git+https://git.paho.at/phohenecker/pytorch-transformer
+```
+
+
 Usage
 -----
 
