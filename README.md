@@ -12,7 +12,7 @@ Installation
 The easiest way to install this package is via pip:
 
 ```bash
-pip install git+https://git.paho.at/phohenecker/pytorch-transformer
+pip install git+https://github.com/phohenecker/pytorch-transformer
 ```
 
 

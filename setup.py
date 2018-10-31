@@ -66,6 +66,6 @@ setup(
                 "transformer"
         ],
         python_requires=">=3.6",
-        url="https://git.paho.at/phohenecker/pytorch-transformer",
+        url="https://github.com/phohenecker/pytorch-transformer",
         version="2018.1"
 )
