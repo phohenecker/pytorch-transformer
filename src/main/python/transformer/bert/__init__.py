@@ -1,13 +1,14 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""This package implements modules for pretraining the encoder part of the transformer via BERT."""
 
-from distutils.core import setup
+
+from transformer.bert.mlm_loss import MLMLoss
 
 
 __author__ = "Patrick Hohenecker"
 __copyright__ = (
-        "Copyright (c) 2018, Patrick Hohenecker\n"
+        "Copyright (c) 2019, Patrick Hohenecker\n"
         "All rights reserved.\n"
         "\n"
         "Redistribution and use in source and binary forms, with or without\n"
@@ -31,43 +32,8 @@ __copyright__ = (
         "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 )
 __license__ = "BSD-2-Clause"
-__version__ = "2018.1"
-__date__ = "Aug 21, 2018"
+__version__ = "2019.1"
+__date__ = "23 Apr 2019"
 __maintainer__ = "Patrick Hohenecker"
 __email__ = "mail@paho.at"
 __status__ = "Development"
-
-
-# read the long description from the read me file
-long_description = open("README.md").read()
-
-
-setup(
-        author="Patrick Hohenecker",
-        author_email="mail@paho.at",
-        classifiers=[
-                "Programming Language :: Python :: 3.6",
-                "Programming Language :: Python :: 3.7"
-        ],
-        copyright="Copyright (c) 2018 Patrick Hohenecker",
-        data_files=[
-                (".", ["LICENSE", "README.md"])
-        ],
-        description="A PyTorch implementation of the Transformer model from \"Attention Is All You Need\".",
-        install_requires=[
-                "insanity>=2017.1",
-                "numpy>=1.15.0",
-                "torch>=0.4.1"
-        ],
-        license="BSD-2-Clause",
-        long_description=long_description,
-        name="transformer",
-        package_dir={"": "src/main/python"},
-        packages=[
-                "transformer",
-                "transformer.bert"
-        ],
-        python_requires=">=3.6",
-        url="https://github.com/phohenecker/pytorch-transformer",
-        version="2018.1"
-)

@@ -37,4 +37,5 @@ dependencies:
   - numpy>=1.15.0
   - pytorch>=0.4.1
   - pip:
+    - insanity>=2017.1
     - torchtestcase>=2018.2

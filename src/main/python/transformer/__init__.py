@@ -3,6 +3,9 @@
 """A PyTorch implementation of the Transformer model from "Attention Is All You Need"."""
 
 
+import transformer.bert as bert
+
+from transformer.encoder import Encoder
 from transformer.transformer import Transformer
 from transformer.transformer_tools import *
 
