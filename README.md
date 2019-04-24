@@ -55,9 +55,24 @@ output_seq = transformer.sample_output(model, input_seq, eos_index, pad_index, m
 ```
 
 
+Pretraining Encoders with BERT
+------------------------------
+
+For pretraining the encoder part of the transformer
+(i.e.,[`transformer.Encoder`](src/main/python/transformer/encoder.py))
+with BERT (Devlin et al., 2018), the class [`MLMLoss`](src/main/python/transformer/bert/mlm_loss.py) provides an
+implementation of the masked language-model loss function.
+A full example of how to implement pretraining with BERT can be found in
+[`examples/bert_pretraining.py`](examples/bert_pretraining.py).
+
+
 References
 ----------
 
-> Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., Polosukhin, I.  
+> Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., Polosukhin, I. (2017).
 > Attention Is All You Need.  
-> Preprint at http://arxiv.org/abs/1706.03762, 2017.
+> Preprint at http://arxiv.org/abs/1706.03762.
+
+> Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018).  
+> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.  
+> Preprint at http://arxiv.org/abs/1810.04805.
