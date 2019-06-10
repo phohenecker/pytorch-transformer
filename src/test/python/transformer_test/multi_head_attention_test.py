@@ -48,6 +48,7 @@ class MultiHeadAttentionTest(ttc.TorchTestCase):
     TOLERANCE = 1e-5
     
     def setUp(self):
+        self.eps = self.TOLERANCE
         np.seterr(all="raise")
         
         self.num_heads = 2
