@@ -219,7 +219,6 @@ class MultiHeadAttention(nn.Module):
         assert queries.size(0) == keys.size(0)
         assert queries.size(0) == values.size(0)
         assert queries.size(2) == keys.size(2)
-        assert queries.size(2) == values.size(2)
         assert keys.size(1) == values.size(1)
         if mask is not None:
             assert isinstance(mask, torch.ByteTensor) or isinstance(mask, torch.cuda.ByteTensor)
